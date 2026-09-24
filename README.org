@@ -1,0 +1,106 @@
+#+TITLE: Ob-Scala
+* Description
+Allow evaluating scala code via Org Babel source blocks via =scala-cli=
+
+* Usage
+To enable Scala in Org Mode source blocks add the language to org initialization:
+#+begin_src elisp
+  (org-babel-do-load-languages
+   'org-babel-load-languages
+   '((scala . t) ... ))
+#+end_src
+
+Or you can load immediately:
+#+begin_src elisp
+  (org-babel-do-load-languages 'org-babel-load-languages
+                               (append org-babel-load-languages '((scala . t)))
+#+end_src
+
+* Header arguments
+| :verbose     | Run scala-cli with '--verbose'. Default is '-q'                   |
+| :log-command | Log the run command and all source to Messages buffer             |
+| :eval-type   | If "source", run snippet as a source file instead of as a scriptt |
+| :options     | Pass additional options to scala-cli when running                 |
+
+** Eval Type
+Setting =:eval-type source= will make the block be evaluated as a source file
+instead of as a script. This means your code has to be wrapped in some sort of
+~main~ function for it to run properly.
+
+This is useful, for instance, when evaluating different main runners, which
+don't work on script files. For example, ~IOApp~ from =Cats= or ~ZIOApp~ from
+=ZIO=.
+
+Any other =eval-type= will be treated as the default, which is to evaluate as a
+script. All code is evaluated immediately as if it were part of the main
+function.
+
+* Variables
+Any declared variables for the block will be created as variables in the scala
+code as top-level vals with the same name. For example:
+
+#+begin_src scala :var amount=10 text="some text"
+  println(s"Text=$text. Amount=$amount")
+#+end_src
+
+will result in the following code:
+#+begin_src scala
+  val amount=10
+  val text="""some text"""
+  println(s"Text=$text. Amount=$amount")
+#+end_src
+
+** Booleans
+Booleans are special cased from the strings "true" and "false", which will
+become plain ~true~ and ~false~ when declared.
+
+** Lists
+Lists are created as Scala Lists, recursively handling the inner values. This
+means you can safely do something like:
+#+begin_src scala :var ns='("a string" 2 "another string") :log-command
+  // val ns=List("""a string""", 2, """another string""")
+  println(ns)
+#+end_src
+
+In this particular case, this will be handled as a ~List[Any]~ in the language,
+because the ~2~ is an ~Int~. It does mean, however, that ~List[Int]~ and
+~List[String]~ will both have the expected types.
+
+** Reading lists from org data
+A table like the following:
+
+#+NAME: data
+| A | 1 |
+| B | 2 |
+
+will be converted to a list of rows, each of which is also a list:
+#+begin_src scala :var d=data :log-command
+  // val d=List(List("""A""", 1), List("""B""", 2))
+  println(d)
+#+end_src
+
+#+RESULTS:
+: List(List(A, 1), List(B, 2))
+
+If you want a simple list you can do it like this:
+#+NAME: mylist
+- elem1
+- elem2
+- elem3
+
+#+begin_src scala :var elems=mylist :log-command
+  // val elems=List("""elem1""", """elem2""", """elem3""")
+  println(elems)
+#+end_src
+
+#+RESULTS:
+: List(elem1, elem2, elem3)
+
+Of course anything that produces a list can be bound to a variable and used
+within the code.
+
+* Directives and variables
+Variables must be declared *after* directives or else these last ones will be
+skipped. Therefore, any variables will be inserted immediately after directives.
+Equivalently, they are inserted before the first non-directive, non-comment,
+non-blank line.
