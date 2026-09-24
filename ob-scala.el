@@ -5,7 +5,7 @@
 ;; Author: Eduardo Barrientos
 ;; Keywords: literate programming, reproducible research, Scala
 ;; Homepage: https://github.com/kdoomsday
-;; Version: 0.02
+;; Version: 0.03
 
 ;;; License:
 
@@ -26,43 +26,20 @@
 
 ;;; Commentary:
 
-;; This file is not intended to ever be loaded by org-babel, rather it is a
-;; template for use in adding new language support to Org-babel. Good first
-;; steps are to copy this file to a file named by the language you are adding,
-;; and then use `query-replace' to replace all strings of "template" in this
-;; file with the name of your new language.
-
-;; After the `query-replace' step, it is recommended to load the file and
-;; register it to org-babel either via the customize menu, or by evaluating the
-;; line: (add-to-list 'org-babel-load-languages '(scala . t)) where
-;; `scala' should have been replaced by the name of the language you are
-;; implementing (note that this applies to all occurrences of 'scala' in this
-;; file).
-
+;; Allow running scala code from an Org source block.
+;; Enable the language via
+;;
+;;   (org-babel-do-load-languages
+;;     'org-babel-load-languages
+;;     '((scala . t) ... ))
+;;
 ;; After that continue by creating a simple code block that looks like e.g.
 ;;
 ;; #+begin_src scala
 
-;; test
+;; println("Hello from scala!")
 
 ;; #+end_src
-
-;; Finally you can use `edebug' to instrumentalize
-;; `org-babel-expand-body:scala' and continue to evaluate the code block. You
-;; try to add header keywords and change the body of the code block and
-;; reevaluate the code block to observe how things get handled.
-
-;;
-;; If you have questions as to any of the portions of the file defined
-;; below please look to existing language support for guidance.
-;;
-;; If you are planning on adding a language to org-babel we would ask
-;; that if possible you fill out the FSF copyright assignment form
-;; available at https://orgmode.org/request-assign-future.txt as this
-;; will make it possible to include your language support in the core
-;; of Org-mode, otherwise unassigned language support files can still
-;; be included in the contrib/ directory of the Org-mode repository.
-
 
 ;;; Requirements:
 
