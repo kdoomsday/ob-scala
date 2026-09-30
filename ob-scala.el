@@ -5,7 +5,7 @@
 ;; Author: Eduardo Barrientos
 ;; Keywords: literate programming, reproducible research, Scala
 ;; Homepage: https://github.com/kdoomsday
-;; Version: 0.03
+;; Version: 0.04
 
 ;;; License:
 
@@ -36,9 +36,7 @@
 ;; After that continue by creating a simple code block that looks like e.g.
 ;;
 ;; #+begin_src scala
-
-;; println("Hello from scala!")
-
+;;   println("Hello from scala!")
 ;; #+end_src
 
 ;;; Requirements:
@@ -57,6 +55,23 @@
 
 ;; optionally define a file extension for this language
 (add-to-list 'org-babel-tangle-lang-exts '("scala" . "sc"))
+
+;; Customization variables
+(defgroup Ob-Scala nil
+  "Scala Programming Language"
+  :group 'convenience
+  :prefix "ob-scala/")
+
+(defcustom ob-scala/scala-command "scala"
+  "Command used to execute scala code. Default 'scala'.
+  You can provide the command with explicit path to use a specific version"
+  :type 'string
+  :group 'Ob-Scala)
+
+(defcustom ob-scala/execution-arguments "-q"
+  "Extra arguments to be passed to scala-cli when calling"
+  :type 'string
+  :group 'Ob-Scala)
 
 ;; optionally declare default header arguments for this language
 (defvar org-babel-default-header-args:scala '())
@@ -161,8 +176,8 @@ This function is called by `org-babel-execute-src-block'"
          (logCommand (assoc :log-command params))
          (options (or (alist-get :options params) ""))
          (executeCommand (format "%s %s %s %s %s"
-                                 scala-extras-command
-                                 scala-extras-execution-arguments
+                                 ob-scala/scala-command
+                                 ob-scala/execution-arguments
                                  verboseOpts
                                  options
                                  evalType)))
